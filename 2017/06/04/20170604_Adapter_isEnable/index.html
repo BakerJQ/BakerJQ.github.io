@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="案前提要虽然由于RecycleView的出现，ListView已经较少的被使用，但是在维护项目之前的代码时，难免还是会遇到需要对相关ListView的Adapter做调整的情况，这次记录的，就是在UI改版时，调整列表视图所遇到的一个小问题——divider无法显示。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ListView的divider为何无法显示？究竟是道德沦丧，还是...">
+<meta property="og:url" content="http://bakerjq.github.io/2017/06/04/20170604_Adapter_isEnable/index.html">
+<meta property="og:site_name" content="BakerJ">
+<meta property="og:description" content="案前提要虽然由于RecycleView的出现，ListView已经较少的被使用，但是在维护项目之前的代码时，难免还是会遇到需要对相关ListView的Adapter做调整的情况，这次记录的，就是在UI改版时，调整列表视图所遇到的一个小问题——divider无法显示。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://bakerjq.github.io/images/20170604_Adapter_isEnable.jpg">
+<meta property="og:updated_time" content="2017-06-04T15:17:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ListView的divider为何无法显示？究竟是道德沦丧，还是...">
+<meta name="twitter:description" content="案前提要虽然由于RecycleView的出现，ListView已经较少的被使用，但是在维护项目之前的代码时，难免还是会遇到需要对相关ListView的Adapter做调整的情况，这次记录的，就是在UI改版时，调整列表视图所遇到的一个小问题——divider无法显示。">
+<meta name="twitter:image" content="http://bakerjq.github.io/images/20170604_Adapter_isEnable.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://bakerjq.github.io/2017/06/04/20170604_Adapter_isEnable/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ListView的divider为何无法显示？究竟是道德沦丧，还是... | BakerJ</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BakerJ</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://bakerjq.github.io/2017/06/04/20170604_Adapter_isEnable/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BakerJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BakerJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ListView的divider为何无法显示？究竟是道德沦丧，还是...
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div align="center"><br><br><img src="../../../../../images/20170604_Adapter_isEnable.jpg" alt=""><br><br></div>
+
+<h2 id="案前提要"><a href="#案前提要" class="headerlink" title="案前提要"></a>案前提要</h2><p>虽然由于RecycleView的出现，ListView已经较少的被使用，但是在维护项目之前的代码时，难免还是会遇到需要对相关ListView的Adapter做调整的情况，这次记录的，就是在UI改版时，调整列表视图所遇到的一个小问题——divider无法显示。</p>
+<a id="more"></a>
+<h2 id="案情概览"><a href="#案情概览" class="headerlink" title="案情概览"></a>案情概览</h2><p>在APP改版项目中，有一个列表界面的UI改动，其中就包括了对分割线——也就是divider——的样式改动，团队中的一个小伙伴发现之前的divider效果，是在每个item下面加了一个View并设置背景实现的，使得这个item徒增了一层LinearLayout，于是想趁着改版一并优化一下，直接使用ListView的divider。然后。。。天有不测风云。。。divider居然。。。出！不！来！！！更奇怪的是，改变dividerHeight每一项之间的间隔是会改变的，也就是说dividerHeight是有效的，但是divider就是不显示。</p>
+<p>于是，这位小伙伴找到我，让我看一看。既然问题被交到我这了，那自然只有去解决了。</p>
+<h2 id="案情分析"><a href="#案情分析" class="headerlink" title="案情分析"></a>案情分析</h2><p>拿到问题后，我前前后后看了看代码，自然也是去百度Google了一翻，仍没有找到答案，那么只有遵循程序员第一原则了——Reading the Fucking Source Code！！！</p>
+<p>于是，我进入到ListView的源码中去寻找答案，去看看ListView对divider的绘制究竟是怎么执行的。下面是dispatchDraw相关代码，省去与divider无关代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">dispatchDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">//这句很好理解</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> drawDividers = dividerHeight &gt; <span class="number">0</span> &amp;&amp; mDivider != <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">//我们这次不关心OverscrollHeader和OverscrollFooter</span></span><br><span class="line">    <span class="keyword">if</span> (drawDividers || drawOverscrollHeader || drawOverscrollFooter) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> count = getChildCount();</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> scrollY = mScrollY;</span><br><span class="line">        <span class="comment">//如果是从上到下的填充顺序</span></span><br><span class="line">        <span class="keyword">if</span> (!mStackFromBottom) &#123;</span><br><span class="line">            <span class="comment">//第一次判断，绘制顶端divider，只是单纯判断是否需要绘制divider</span></span><br><span class="line">            <span class="keyword">if</span> (count &gt; <span class="number">0</span> &amp;&amp; scrollY &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (drawOverscrollHeader) &#123;</span><br><span class="line">                    ...</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (drawDividers) &#123;</span><br><span class="line">                    bounds.bottom = <span class="number">0</span>;</span><br><span class="line">                    bounds.top = -dividerHeight;</span><br><span class="line">                    drawDivider(canvas, bounds, -<span class="number">1</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//遍历子视图</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</span><br><span class="line">                ...</span><br><span class="line">                <span class="comment">//如果展示headerDivider、footerDivider</span></span><br><span class="line">                <span class="comment">//或者当前不是header、footer，即item</span></span><br><span class="line">                <span class="keyword">if</span> ((headerDividers || !isHeader) &amp;&amp; (footerDividers || !isFooter)) &#123;</span><br><span class="line">                    ...</span><br><span class="line">                    <span class="comment">//主要还是drawDivider判断</span></span><br><span class="line">                    <span class="comment">//剩下的只是保证当前不是在列表最后一项以及不用绘制OverscrollFooter</span></span><br><span class="line">                    <span class="keyword">if</span> (drawDividers &amp;&amp; (bottom &lt; listBottom)</span><br><span class="line">                                &amp;&amp; !(drawOverscrollFooter &amp;&amp; isLastItem)) &#123;</span><br><span class="line">                        ...</span><br><span class="line">                        <span class="comment">//关键的判断，前方高能！！！</span></span><br><span class="line">                        <span class="comment">//如果adapter中设置的当前项是enable的</span></span><br><span class="line">                        <span class="comment">//并且（要么绘制headerDivider，要么只是普通item）</span></span><br><span class="line">                        <span class="comment">//并且（要么是最后一项，要么adapter中下一项是enable的，</span></span><br><span class="line">                        <span class="comment">//要么绘制footerDivider）。。。。。。</span></span><br><span class="line">                        <span class="comment">//简单来说，就是只有在两个enable的item之间，才会绘制divider</span></span><br><span class="line">                        <span class="keyword">if</span> (adapter.isEnabled(itemIndex) &amp;&amp; </span><br><span class="line">                            (headerDividers || !isHeader &amp;&amp; (nextIndex &gt;= headerCount)) &amp;&amp; </span><br><span class="line">                            (isLastItem || adapter.isEnabled(nextIndex) &amp;&amp; </span><br><span class="line">                             (footerDividers || !isFooter &amp;&amp; </span><br><span class="line">                              (nextIndex &lt; footerLimit)))) &#123;</span><br><span class="line">                                  bounds.top = bottom;</span><br><span class="line">                                  bounds.bottom = bottom + dividerHeight;</span><br><span class="line">                                  drawDivider(canvas, bounds, i);</span><br><span class="line">                        &#125;<span class="keyword">else</span> <span class="keyword">if</span>(...)&#123;...&#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;<span class="comment">//从下往上的情况只是判断方式有区别，不再详述</span></span><br><span class="line">          ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有点晕= =。。。总的来说，就是只有当两个item都是可用的情况下，才会在他们之间绘制divider，而这个是否可用，就是由adapter的isEnable方法返回的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseAdapter</span> <span class="keyword">implements</span> <span class="title">ListAdapter</span>, <span class="title">SpinnerAdapter</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isEnabled</span><span class="params">(<span class="keyword">int</span> position)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>默认情况下，该方法是返回true的。</p>
+<h2 id="真相大白"><a href="#真相大白" class="headerlink" title="真相大白"></a>真相大白</h2><p>到这里，似乎就明朗了，如果对于divider的配置都是正确的话，那么外部还能影响每个item之间divider展示的，就只有isEnable方法了。</p>
+<p>到相关的adapter里一看，果不其然，在某些情况下，返回了false。那么为什么要这么写呢，原来这个isEnable还有另外一个作用，我们再来看看源码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbsListView</span>....</span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setItemViewLayoutParams</span><span class="params">(View child, <span class="keyword">int</span> position)</span> </span>&#123;</span><br><span class="line">    	...</span><br><span class="line">         lp.isEnabled = mAdapter.isEnabled(position);</span><br><span class="line">      	...</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onTouchUp</span><span class="params">(MotionEvent ev)</span> </span>&#123;</span><br><span class="line">    	...</span><br><span class="line">         <span class="keyword">else</span> <span class="keyword">if</span> (!mDataChanged &amp;&amp; mAdapter.isEnabled(motionPosition)) &#123;</span><br><span class="line">         	performClick.run();</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看完这些相信大家也明白了，在相应position返回fasle的情况下，该位置对应的item点击是无效的，当初的某位小伙伴就是为了屏蔽某些情况下的点击事件，才这么写了，或许当时也是发现了divider的问题，才在item的视图中加了一个view做为divider的代替。</p>
+<h2 id="案情回顾"><a href="#案情回顾" class="headerlink" title="案情回顾"></a>案情回顾</h2><p>最后，总结一下：</p>
+<p>1、Adapter的isEnable方法，可以决定对应位置的item是否可以被点击；</p>
+<p>2、只有在两个item对应的position在Adapter中isEnable方法返回为true的时候，才会在这两个item之间绘制divider。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/28/20170528_InfiniteCard/" rel="next" title="可自定义动效的卡片切换视图">
+                <i class="fa fa-chevron-left"></i> 可自定义动效的卡片切换视图
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">BakerJ</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#案前提要"><span class="nav-number">1.</span> <span class="nav-text">案前提要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案情概览"><span class="nav-number">2.</span> <span class="nav-text">案情概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案情分析"><span class="nav-number">3.</span> <span class="nav-text">案情分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#真相大白"><span class="nav-number">4.</span> <span class="nav-text">真相大白</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案情回顾"><span class="nav-number">5.</span> <span class="nav-text">案情回顾</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BakerJ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

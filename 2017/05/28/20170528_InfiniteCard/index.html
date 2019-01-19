@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言面对众多卡片层叠效果，我们的产品童鞋也突发奇想，搞出了另一种卡片层叠切换展示的交互，而且产品狗们居然要求多做几种动效给他们看，好让他们选择，这简直就是要搞事情啊，what are you 弄啥咧？！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="可自定义动效的卡片切换视图">
+<meta property="og:url" content="http://bakerjq.github.io/2017/05/28/20170528_InfiniteCard/index.html">
+<meta property="og:site_name" content="BakerJ">
+<meta property="og:description" content="前言面对众多卡片层叠效果，我们的产品童鞋也突发奇想，搞出了另一种卡片层叠切换展示的交互，而且产品狗们居然要求多做几种动效给他们看，好让他们选择，这简直就是要搞事情啊，what are you 弄啥咧？！">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://bakerjq.github.io/images/20170528_InfiniteCard.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/BakerJQ/Android-InfiniteCards/master/screenshot/sample.gif">
+<meta property="og:updated_time" content="2017-06-04T15:28:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="可自定义动效的卡片切换视图">
+<meta name="twitter:description" content="前言面对众多卡片层叠效果，我们的产品童鞋也突发奇想，搞出了另一种卡片层叠切换展示的交互，而且产品狗们居然要求多做几种动效给他们看，好让他们选择，这简直就是要搞事情啊，what are you 弄啥咧？！">
+<meta name="twitter:image" content="http://bakerjq.github.io/images/20170528_InfiniteCard.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://bakerjq.github.io/2017/05/28/20170528_InfiniteCard/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>可自定义动效的卡片切换视图 | BakerJ</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BakerJ</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://bakerjq.github.io/2017/05/28/20170528_InfiniteCard/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BakerJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BakerJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">可自定义动效的卡片切换视图
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div align="center"><br><br><img src="../../../../../images/20170528_InfiniteCard.jpg" alt=""><br><br></div>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>面对众多卡片层叠效果，我们的产品童鞋也突发奇想，搞出了另一种卡片层叠切换展示的交互，而且产品狗们居然要求多做几种动效给他们看，好让他们选择，这简直就是要搞事情啊，what are you 弄啥咧？！</p>
+<a id="more"></a>
+<p>“哥哥我做不到啊…..啊…..呸”，做为一名有节操的程序猿，自然是不能说出这么没有出息的话，哥就满足你们，于是，出了个可自定义动效的卡片切换视图，效果如下所示</p>
+<div align="center"><br><br><img src="https://raw.githubusercontent.com/BakerJQ/Android-InfiniteCards/master/screenshot/sample.gif" alt=""><br><br></div>
+
+<p>Github地址：<a href="https://github.com/BakerJQ/Android-InfiniteCards" target="_blank" rel="noopener">https://github.com/BakerJQ/Android-InfiniteCards</a></p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>首先，要展示出卡片层叠的视觉效果。在这里，我们通过方块的缩放大小差异以及在Y方向上的位置差异，来展现这种视觉效果。</p>
+<p>其次，要能够方便的定义卡片视图内容。我们通过都很熟悉的设置Adapter的方式来构建内容视图。</p>
+<p>最后，要能够自定义动效。我们通过定义一个由0到1的ValueAnimator，即每个动画的过程，其实就是该ValueAnimator在一个动画周期内，从0变化到1的过程，0表示动画刚开始，1表示动画结束了，0.5则表示这一轮动画已经执行到了一半。这样，通过转换器以及插值器，我们就可以根据ValueAnimator实时的值，来设置当前正在执行动画的卡片应该有的“样子”。</p>
+<h2 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h2><p>我们给出三种基本的动画模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * ANIM_TYPE_FRONT:被选中的卡片通过自定义动效移至第一，其他的卡片通过通用动效补位</span></span><br><span class="line"><span class="comment"> * ANIM_TYPE_SWITCH:选中的卡片和第一张卡片互换位置，并都是自定义动效</span></span><br><span class="line"><span class="comment"> * ANIM_TYPE_FRONT_TO_LAST:第一张图片通过自定义动效移至最后，其他卡片通过通用动效补位</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ANIM_TYPE_FRONT = <span class="number">0</span>, ANIM_TYPE_SWITCH = <span class="number">1</span>, ANIM_TYPE_FRONT_TO_LAST = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>并通过Helper类来处理所有的动画逻辑，以及Adapter来生成卡片视图</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> CardAnimationHelper mAnimationHelper;</span><br><span class="line"><span class="keyword">private</span> BaseAdapter mAdapter;</span><br></pre></td></tr></table></figure>
+<p>在onMeasure时根据卡片宽高比来设置卡片的尺寸，在此请注意，当前情况下卡片宽度与整体容器宽度一致，后续通过自定义的方式，通过缩放来产生卡片的视觉效果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">float</span> mCardRatio = CARD_SIZE_RATIO;<span class="comment">//宽高比：卡片高 / 卡片宽</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> mCardWidth, mCardHeight;<span class="comment">//卡片宽高</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> (mCardWidth == <span class="number">0</span> || mCardHeight == <span class="number">0</span>) &#123;</span><br><span class="line">        setCardSize(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 根据卡片比例计算卡片宽高，并传入Helper</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setCardSize</span><span class="params">(<span class="keyword">boolean</span> resetAdapter)</span> </span>&#123;</span><br><span class="line">    mCardWidth = getMeasuredWidth();</span><br><span class="line">    mCardHeight = (<span class="keyword">int</span>) (mCardWidth * mCardRatio);</span><br><span class="line">    mAnimationHelper.setCardSize(mCardWidth, mCardHeight);</span><br><span class="line">    mAnimationHelper.initAdapterView(mAdapter, resetAdapter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么如此之后，自然Helper中就保存了视图的主要数据与参数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//卡片列表</span></span><br><span class="line"><span class="keyword">private</span> LinkedList&lt;CardItem&gt; mCards;</span><br><span class="line"><span class="comment">//当前正在向后以及向前移动的卡片</span></span><br><span class="line"><span class="keyword">private</span> CardItem mCardToBack, mCardToFront;</span><br><span class="line"><span class="comment">//正在向后以及向前移动卡片的位置</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> mPositionToBack = <span class="number">0</span>, mPositionToFront = <span class="number">0</span>;</span><br><span class="line"><span class="comment">//动画运行的ValueAnimator</span></span><br><span class="line"><span class="keyword">private</span> ValueAnimator mValueAnimator;</span><br><span class="line"><span class="comment">//当前的动画系数</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">float</span> mCurrentFraction = <span class="number">1</span>;</span><br><span class="line">...<span class="comment">//以及一系列的转换器与插值器</span></span><br></pre></td></tr></table></figure>
+<h2 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h2><p>那么，动画到底是如何实现的，以及如何自定义的呢，我们以通用动画为例，来看看动画的主要流程</p>
+<p>首先，在ValueAnimator更新的时候，获得当前的动画系数，依次来执行动画</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * ValueAnimator动画更新</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onAnimationUpdate</span><span class="params">(ValueAnimator animation)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取当前动画系数</span></span><br><span class="line">    mCurrentFraction = (<span class="keyword">float</span>) animation.getAnimatedValue();</span><br><span class="line">    <span class="comment">//通过插值器获取插值系数</span></span><br><span class="line">    fractionInterpolated = mAnimInterpolator.getInterpolation(mCurrentFraction);</span><br><span class="line">    doAnimationCommon(mCurrentFraction, fractionInterpolated);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着，对需要执行动画的卡片，执行动画，以ANIM_TYPE_FRONT动画模式为例，当选中的卡片移动到最前的时候，原来在这张卡片之前的所有卡片，都要向后移动一位，来留出第一个的位置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 执行通用动画</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doAnimationCommon</span><span class="params">(<span class="keyword">float</span> fraction, <span class="keyword">float</span> fractionInterpolated)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//如果当前动画模式为选中的卡片移到最前</span></span><br><span class="line">    <span class="keyword">if</span> (mAnimType == InfiniteCardView.ANIM_TYPE_FRONT) &#123;</span><br><span class="line">        <span class="comment">//则遍历在选中卡片之前的卡片</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; mPositionToFront; i++) &#123;</span><br><span class="line">            CardItem card = mCards.get(i);</span><br><span class="line">            <span class="comment">//对卡片执行动画，从当前位置移动到后一个位置</span></span><br><span class="line">            doAnimationCommonView(card.view, fraction, fractionInterpolated, i, i + <span class="number">1</span>);</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，通过转换器，对卡片进行自定义动画处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 对视图执行通用动画</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> view                 卡片视图</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> fromPosition         从该位置</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> toPosition           移动到该位置</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doAnimationCommonView</span><span class="params">(View view, <span class="keyword">float</span> fraction, <span class="keyword">float</span> fractionInterpolated, <span class="keyword">int</span></span></span></span><br><span class="line"><span class="function"><span class="params">        fromPosition, <span class="keyword">int</span> toPosition)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//通用转换器转换动画</span></span><br><span class="line">    mTransformerCommon.transformAnimation(view, fraction, mCardWidth,</span><br><span class="line">            mCardHeight, fromPosition, toPosition);</span><br><span class="line">    <span class="keyword">if</span> (mAnimInterpolator != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//通用转换器转换插值动画</span></span><br><span class="line">        mTransformerCommon.transformInterpolatedAnimation(view, fractionInterpolated, 			           mCardWidth,mCardHeight, fromPosition, toPosition);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而转换器的具体实现则以DefaultCommonTransformer为例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transformAnimation</span><span class="params">(View view, <span class="keyword">float</span> fraction, <span class="keyword">int</span> cardWidth, <span class="keyword">int</span> cardHeight, <span class="keyword">int</span> fromPosition, <span class="keyword">int</span> toPosition)</span> </span>&#123;</span><br><span class="line">   <span class="comment">//需要跨越的卡片数量</span></span><br><span class="line">   <span class="keyword">int</span> positionCount = fromPosition - toPosition;</span><br><span class="line">   <span class="comment">//以0.8做为第一张的缩放尺寸，每向后一张缩小0.1</span></span><br><span class="line">   <span class="comment">//(0.8f - 0.1f * fromPosition) = 当前位置的缩放尺寸</span></span><br><span class="line">   <span class="comment">//(0.1f * fraction * positionCount) = 移动过程中需要改变的缩放尺寸</span></span><br><span class="line">   <span class="keyword">float</span> scale = (<span class="number">0.8f</span> - <span class="number">0.1f</span> * fromPosition) + (<span class="number">0.1f</span> * fraction * positionCount);</span><br><span class="line">   ViewHelper.setScaleX(view, scale);</span><br><span class="line">   ViewHelper.setScaleY(view, scale);</span><br><span class="line">   <span class="comment">//在Y方向的偏移量，每向后一张，向上偏移卡片宽度的0.02</span></span><br><span class="line">   <span class="comment">//-cardHeight * (0.8f - scale) * 0.5f 对卡片做整体居中处理</span></span><br><span class="line">   ViewHelper.setTranslationY(view, -cardHeight * (<span class="number">0.8f</span> - scale) * <span class="number">0.5f</span> - cardWidth * (<span class="number">0.02f</span> *</span><br><span class="line">          fromPosition - <span class="number">0.02f</span> * fraction * positionCount));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于向第一位移动的选中卡片，也是同理，只不过是根据该卡片对应的转换器来进行自定义动画的转换。</p>
+<p>最后的效果，就像演示图中第一次点击，图片向前翻转到第一位的效果一样。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>对于产品狗突如其来的想法，咱们程序猿不善于口水仗的，就只能用代码来让他们来服气了。毕竟，大家还都是伐木累嘛，哈哈。</p>
+<p>当实现某个东西遇到困难时，不妨想想Android系统自身的一些实现方式，比如参考ListView的Adapter，ViewPager定义翻页动画的Transformer等等，总会有意想不到的启发。</p>
+<p>再次贴一下Github地址：<a href="https://github.com/BakerJQ/Android-InfiniteCards" target="_blank" rel="noopener">https://github.com/BakerJQ/Android-InfiniteCards</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/21/20170521_First_Step/" rel="next" title="一缕思绪，一步前行">
+                <i class="fa fa-chevron-left"></i> 一缕思绪，一步前行
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/04/20170604_Adapter_isEnable/" rel="prev" title="ListView的divider为何无法显示？究竟是道德沦丧，还是...">
+                ListView的divider为何无法显示？究竟是道德沦丧，还是... <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">BakerJ</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思路"><span class="nav-number">2.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总览"><span class="nav-number">3.</span> <span class="nav-text">总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#细节"><span class="nav-number">4.</span> <span class="nav-text">细节</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BakerJ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
