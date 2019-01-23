@@ -104,7 +104,7 @@
 <meta property="og:description" content="前言“后端更新换代，新接口返回全用新的规则，老接口不变！”。。。WTF！ “我们的这几个网站，要做一个统一的App，后端都是现成的，这是API文档。”。。。几个网站的API规范和请求Host地址居然完全不一样？。。。WTF！ 。。。千万只草泥马呼啸而过。。。实时切换BaseUrl？Retrofit注解全加上@Url？。。。无奈。。。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://bakerjq.github.io/images/20190119_RxRetroHttp.jpg">
-<meta property="og:updated_time" content="2019-01-21T09:17:48.432Z">
+<meta property="og:updated_time" content="2019-01-23T01:06:34.487Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RxRetroHttp，为多套API请求适配而生">
 <meta name="twitter:description" content="前言“后端更新换代，新接口返回全用新的规则，老接口不变！”。。。WTF！ “我们的这几个网站，要做一个统一的App，后端都是现成的，这是API文档。”。。。几个网站的API规范和请求Host地址居然完全不一样？。。。WTF！ 。。。千万只草泥马呼啸而过。。。实时切换BaseUrl？Retrofit注解全加上@Url？。。。无奈。。。">
@@ -344,7 +344,7 @@
 <p>“我们的这几个网站，要做一个统一的App，后端都是现成的，这是API文档。”。。。几个网站的API规范和请求Host地址居然完全不一样？。。。WTF！</p>
 <p>。。。千万只草泥马呼啸而过。。。实时切换BaseUrl？Retrofit注解全加上@Url？。。。无奈。。。</p>
 <a id="more"></a>
-<p>虽然说现在已经有很多Http请求框架了，也有很多针对RxJava+Retrofit的二次封装，但是大多没有针对上述特殊情况下的处理方案。因此，RxRetroHttp应运而生。</p>
+<p>虽然说现在已经有很多Http请求框架了，也有很多针对RxJava+Retrofit的二次封装，其中也不乏很多动态替换BaseUrl的框架。但是如果需要更好的处理除了BaseUrl之外需求，比如针对各套API规则，不同的拦截处理、不同的返回异常逻辑处理等等，大多没有给予解决方案。因此，RxRetroHttp应运而生。</p>
 <p>Github地址：<a href="https://github.com/BakerJQ/RxRetroHttp" target="_blank" rel="noopener">https://github.com/BakerJQ/RxRetroHttp</a></p>
 <h2 id="总览"><a href="#总览" class="headerlink" title="总览"></a>总览</h2><p>我们先来看看，RxRetroHttp是通过什么方式处理这种情况的。</p>
 <h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>首先，大多库的必备阶段：初始化。我们先来看看初始化的代码，在Application的onCreate中执行</p>
