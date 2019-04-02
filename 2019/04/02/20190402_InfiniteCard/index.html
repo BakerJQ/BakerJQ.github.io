@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.7.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言这一段时间，Flutter的势头是越来越猛了，作为一个Android程序猿，我自然也是想要赶紧尝试一把。在学习到动画的这部分后，为了加深对Flutter动画实现的理解，我决定把之前写的一个卡片切换效果的开源小项目，用Flutter“翻译”一遍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flutter自定义实现神奇的卡片切换视图">
+<meta property="og:url" content="http://bakerjq.github.io/2019/04/02/20190402_InfiniteCard/index.html">
+<meta property="og:site_name" content="BakerJ">
+<meta property="og:description" content="前言这一段时间，Flutter的势头是越来越猛了，作为一个Android程序猿，我自然也是想要赶紧尝试一把。在学习到动画的这部分后，为了加深对Flutter动画实现的理解，我决定把之前写的一个卡片切换效果的开源小项目，用Flutter“翻译”一遍。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://bakerjq.github.io/images/20190402_InfiniteCard.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/BakerJQ/Flutter-InfiniteCards/master/screenshot/android.gif">
+<meta property="og:image" content="https://raw.githubusercontent.com/BakerJQ/Flutter-InfiniteCards/master/screenshot/ios.gif">
+<meta property="og:updated_time" content="2019-04-02T14:41:24.371Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Flutter自定义实现神奇的卡片切换视图">
+<meta name="twitter:description" content="前言这一段时间，Flutter的势头是越来越猛了，作为一个Android程序猿，我自然也是想要赶紧尝试一把。在学习到动画的这部分后，为了加深对Flutter动画实现的理解，我决定把之前写的一个卡片切换效果的开源小项目，用Flutter“翻译”一遍。">
+<meta name="twitter:image" content="http://bakerjq.github.io/images/20190402_InfiniteCard.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://bakerjq.github.io/2019/04/02/20190402_InfiniteCard/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Flutter自定义实现神奇的卡片切换视图 | BakerJ</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">BakerJ</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://bakerjq.github.io/2019/04/02/20190402_InfiniteCard/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BakerJ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="BakerJ">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Flutter自定义实现神奇的卡片切换视图
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <div align="center"><br><br><img src="../../../../../images/20190402_InfiniteCard.jpg" alt=""><br><br></div>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>这一段时间，Flutter的势头是越来越猛了，作为一个Android程序猿，我自然也是想要赶紧尝试一把。在学习到动画的这部分后，为了加深对Flutter动画实现的理解，我决定把之前写的一个卡片切换效果的开源小项目，用Flutter“翻译”一遍。</p>
+<a id="more"></a>
+<p>废话不多说，先来看看效果吧：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Android</th>
+<th style="text-align:center">iOS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="https://raw.githubusercontent.com/BakerJQ/Flutter-InfiniteCards/master/screenshot/android.gif" alt=""></td>
+<td style="text-align:center"><img src="https://raw.githubusercontent.com/BakerJQ/Flutter-InfiniteCards/master/screenshot/ios.gif" alt=""></td>
+</tr>
+</tbody>
+</table>
+<p>Github地址：<a href="https://github.com/BakerJQ/Flutter-InfiniteCards" target="_blank" rel="noopener">https://github.com/BakerJQ/Flutter-InfiniteCards</a></p>
+<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><p>首先，关于卡片的层叠效果，在原Android项目中，是通过Scale差异以及TranslationY来体现的，Flutter可以继续采用这种方式。</p>
+<p>其次，对于自定义卡片的内容，原Android项目是通过Adapter实现，对于Flutter，则可以采用IndexedWidgetBuilder实现。</p>
+<p>最后，就是自定义动效的实现，原Android项目是通过一个0到1的ValueAnimator来定义动画的展示过程，而Flutter中，正好有与之对应的Animation和AnimationController，如此我们就可以直接自定义一个动画过程中，具体的视图展示方式。</p>
+<h2 id="组件总览"><a href="#组件总览" class="headerlink" title="组件总览"></a>组件总览</h2><p>由于卡片视图需要根据动画情况进行渲染，所以显然是一个StatefulWidget。</p>
+<p>同时，我们给出三种基本的动画模式：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> AnimType &#123;</span><br><span class="line">  TO_FRONT,<span class="comment">//被选中的卡片通过自定义动效移至第一，其他的卡片通过通用动效补位</span></span><br><span class="line">  SWITCH,<span class="comment">//选中的卡片和第一张卡片互换位置，并都是自定义动效</span></span><br><span class="line">  TO_END,<span class="comment">//第一张图片通过自定义动效移至最后，其他卡片通过通用动效补位</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>并通过Helper和Controller来处理所有的动画逻辑</p>
+<p>其中Controller由构造方法传入</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">InfiniteCards(&#123;</span><br><span class="line">  <span class="meta">@required</span> <span class="keyword">this</span>.controller,</span><br><span class="line">  <span class="keyword">this</span>.width,</span><br><span class="line">  <span class="keyword">this</span>.height,</span><br><span class="line">  <span class="keyword">this</span>.background,</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>Helper在initState中进行构建，并初始化，同时将Helper绑定给Controller：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@override</span></span><br><span class="line"><span class="keyword">void</span> initState() &#123;</span><br><span class="line">  ...</span><br><span class="line">  _helper = AnimHelper(</span><br><span class="line">      controller: widget.controller,</span><br><span class="line">      <span class="comment">//传入动画更新监听，动画时调用setState进行实时渲染</span></span><br><span class="line">      listenerForSetState: () &#123;</span><br><span class="line">        setState(() &#123;&#125;);</span><br><span class="line">      &#125;);</span><br><span class="line">  _helper.init(<span class="keyword">this</span>, context);</span><br><span class="line">  <span class="keyword">if</span> (widget.controller != <span class="keyword">null</span>) &#123;</span><br><span class="line">      widget.controller.animHelper = _helper;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而build过程中，则通过Helper返回具体的Widget列表，而Stack则是为了实现层叠效果。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Widget build(BuildContext context) &#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">return</span> Container(</span><br><span class="line">    ...</span><br><span class="line">    child: Stack(</span><br><span class="line">      children: _helper.getCardList(_width, _height),</span><br><span class="line">    ),</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如此，基本的初始化等操作就算是完成了。下面我们来看看Controller和Helper都是怎么工作的。</p>
+<h2 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h2><p>我们先来看看Controller所包含的内容：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InfiniteCardsController</span> </span>&#123;</span><br><span class="line">  <span class="comment">//卡片构造器</span></span><br><span class="line">  IndexedWidgetBuilder _itemBuilder;</span><br><span class="line">  <span class="comment">//卡片个数</span></span><br><span class="line">  <span class="built_in">int</span> _itemCount;</span><br><span class="line">  <span class="comment">//动画时长</span></span><br><span class="line">  <span class="built_in">Duration</span> _animDuration;</span><br><span class="line">  <span class="comment">//点击卡片是否触发切换动画</span></span><br><span class="line">  <span class="built_in">bool</span> _clickItemToSwitch;</span><br><span class="line">  <span class="comment">//动画Transform</span></span><br><span class="line">  AnimTransform _transformToFront,_transformToBack,...;</span><br><span class="line">  <span class="comment">//排序Transform</span></span><br><span class="line">  ZIndexTransform _zIndexTransformCommon,...;</span><br><span class="line">  <span class="comment">//动画类型</span></span><br><span class="line">  AnimType _animType;</span><br><span class="line">  <span class="comment">//曲线定义（类Android插值器）</span></span><br><span class="line">  Curve _curve;</span><br><span class="line">  <span class="comment">//helper</span></span><br><span class="line">  AnimHelper _animHelper;</span><br><span class="line">  ...</span><br><span class="line">  <span class="keyword">void</span> anim(<span class="built_in">int</span> index) &#123;</span><br><span class="line">    _animHelper.anim(index);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">void</span> reset(...) &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">//重设各参数</span></span><br><span class="line">    setControllerParams();</span><br><span class="line">    _animHelper.reset(); </span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由此可以看到，Controller基本上就是作为参数配置器和Helper的方法代理的存在。由此童鞋们肯定就知道了，对于动效的自定义和动效的触发等操作，都是通过Controller来完成，demo如下：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//构建Controller</span></span><br><span class="line">_controller = InfiniteCardsController(</span><br><span class="line">  itemBuilder: _renderItem,</span><br><span class="line">  itemCount: <span class="number">5</span>,</span><br><span class="line">  animType: AnimType.SWITCH,</span><br><span class="line">);</span><br><span class="line"><span class="comment">//调用reset</span></span><br><span class="line">_controller.reset(</span><br><span class="line">  itemCount: <span class="number">4</span>,</span><br><span class="line">  animType: AnimType.TO_FRONT,</span><br><span class="line">  transformToBack: _customToBackTransform,</span><br><span class="line">);</span><br><span class="line"><span class="comment">//调用展示下一张卡片动画</span></span><br><span class="line">_controller.reset(animType: AnimType.TO_END);</span><br><span class="line">_controller.next();</span><br></pre></td></tr></table></figure>
+<p>关于具体的自定义，我们稍后再聊，咱们先来看看Helper。</p>
+<h2 id="Helper"><a href="#Helper" class="headerlink" title="Helper"></a>Helper</h2><p>Helper是整个动画效果实现的核心类，我们先看几个它所包含的核心成员：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnimHelper</span> </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> InfiniteCardsController controller;</span><br><span class="line">  <span class="comment">//切换动画</span></span><br><span class="line">  AnimationController _animationController;</span><br><span class="line">  Animation&lt;<span class="built_in">double</span>&gt; _animation;</span><br><span class="line">  <span class="comment">//卡片列表</span></span><br><span class="line">  <span class="built_in">List</span>&lt;CardItem&gt; _cardList = <span class="keyword">new</span> <span class="built_in">List</span>();</span><br><span class="line">  <span class="comment">//需要向后切换的卡片，和需要向前切换的卡片</span></span><br><span class="line">  CardItem _cardToBack, _cardToFront;</span><br><span class="line">  <span class="comment">//需要向后切换的卡片位置，和需要向前切换的卡片位置</span></span><br><span class="line">  <span class="built_in">int</span> _positionToBack, _positionToFront;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在我们来看看，如果要触发一个切换动画，这些成员是如何相互配合的。</p>
+<p>当选中一张卡片进行切换时，这张卡片就是需要向前切换的卡片（ToFront），而第一张卡片，就是需要向后切换的卡片（ToBack）。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> _cardAnim(<span class="built_in">int</span> index, CardItem card) &#123;</span><br><span class="line">  <span class="comment">//记录要切换的卡片</span></span><br><span class="line">  _cardToFront = card;</span><br><span class="line">  _cardToBack = _cardList[<span class="number">0</span>];</span><br><span class="line">  _positionToBack = <span class="number">0</span>;</span><br><span class="line">  _positionToFront = index;</span><br><span class="line">  <span class="comment">//触发动画</span></span><br><span class="line">  _animationController.forward(from: <span class="number">0.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于设置了AnimationListener，在动画过程中，setState就会被调用，如此就会触发Widget的build，从而触发Helper的getCardList方法。我们来看看在切换动画的过程中，是如何返回卡片Widget列表的。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">List</span>&lt;Widget&gt; getCardList(<span class="built_in">double</span> width, <span class="built_in">double</span> height) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; controller.itemCount; i++) &#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">if</span> (_isSwitchAnim) &#123;</span><br><span class="line">      <span class="comment">//处理切换动画</span></span><br><span class="line">      _switchTransform(width, height, i);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//根据zIndex进行排序渲染</span></span><br><span class="line">  <span class="built_in">List</span>&lt;CardItem&gt; copy = <span class="built_in">List</span>.from(_cardList);</span><br><span class="line">  copy.sort((card1, card2) &#123;</span><br><span class="line">    <span class="keyword">return</span> card1.zIndex &lt; card2.zIndex ? <span class="number">1</span> : <span class="number">-1</span>;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="keyword">return</span> copy.map((card) &#123;</span><br><span class="line">    <span class="keyword">return</span> card.transformWidget;</span><br><span class="line">  &#125;).toList();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上代码所示，先进行动画处理，后根据zIndex进行排序，因为要保证在前面的后渲染。</p>
+<p>而动画是如何处理的呢，以切换到前面的卡片为例：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> _toFrontTransform(<span class="built_in">double</span> width, <span class="built_in">double</span> height, <span class="built_in">int</span> fromPosition, <span class="built_in">int</span> toPosition) &#123;</span><br><span class="line">    CardItem cardItem = _cardList[fromPosition];</span><br><span class="line">    controller.zIndexTransformToFront(</span><br><span class="line">        cardItem, _animation.value,</span><br><span class="line">        _getCurveValue(_animation.value),</span><br><span class="line">        width, height, fromPosition, toPosition);</span><br><span class="line">    cardItem.transformWidget = controller.transformToFront(</span><br><span class="line">        cardItem.widget, _animation.value,</span><br><span class="line">        _getCurveValue(_animation.value),</span><br><span class="line">        width, height, fromPosition, toPosition);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>原来，正是在这一步，Helper通过Controller中配置的自定义动画方法，得到了卡片的Widget。</p>
+<p>由此，动画展示的基本流程就描述完了，下面我们进入最关键的部分–如何自定义动画。</p>
+<h2 id="自定义动画"><a href="#自定义动画" class="headerlink" title="自定义动画"></a>自定义动画</h2><p>我们以通用动画为例，来看看自定义动画的主要流程。</p>
+<p>首先，AnimTransform为如下方法的定义：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> AnimTransform = Transform <span class="built_in">Function</span>(</span><br><span class="line">    Widget item,<span class="comment">//卡片原始Widget</span></span><br><span class="line">    <span class="built_in">double</span> fraction,<span class="comment">//动画执行的系数</span></span><br><span class="line">    <span class="built_in">double</span> curveFraction,<span class="comment">//曲线转换后的系数</span></span><br><span class="line">    <span class="built_in">double</span> cardHeight,<span class="comment">//整体高度</span></span><br><span class="line">    <span class="built_in">double</span> cardWidth,<span class="comment">//整体宽度</span></span><br><span class="line">    <span class="built_in">int</span> fromPosition,<span class="comment">//卡片开始位置</span></span><br><span class="line">    <span class="built_in">int</span> toPosition);<span class="comment">//卡片要移动到的位置</span></span><br></pre></td></tr></table></figure>
+<p>该方法返回的是一个Transform，专门用于处理视图变换的Widget，而我们要做的，就是根据传入的参数，构建相应系数下的Widget。以DefaultCommonTransform为例：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">Transform _defaultCommonTransform(Widget item, </span><br><span class="line">    <span class="built_in">double</span> fraction, <span class="built_in">double</span> curveFraction, <span class="built_in">double</span> cardHeight, <span class="built_in">double</span> cardWidth, <span class="built_in">int</span> fromPosition, <span class="built_in">int</span> toPosition) </span><br><span class="line">  <span class="comment">//需要跨越的卡片数量&#123;</span></span><br><span class="line">  <span class="built_in">int</span> positionCount = fromPosition - toPosition;</span><br><span class="line">  <span class="comment">//以0.8做为第一张的缩放尺寸，每向后一张缩小0.1</span></span><br><span class="line">  <span class="comment">//(0.8 - 0.1 * fromPosition) = 当前位置的缩放尺寸</span></span><br><span class="line">  <span class="comment">//(0.1 * fraction * positionCount) = 移动过程中需要改变的缩放尺寸 </span></span><br><span class="line">  <span class="built_in">double</span> scale = (<span class="number">0.8</span> - <span class="number">0.1</span> * fromPosition) + (<span class="number">0.1</span> * fraction * positionCount);</span><br><span class="line">  <span class="comment">//在Y方向的偏移量，每向后一张，向上偏移卡片宽度的0.02</span></span><br><span class="line">  <span class="comment">//-cardHeight * (0.8 - scale) * 0.5 对卡片做整体居中处理</span></span><br><span class="line">  <span class="built_in">double</span> translationY = -cardHeight * (<span class="number">0.8</span> - scale) * <span class="number">0.5</span> -</span><br><span class="line">      cardHeight * (<span class="number">0.02</span> * fromPosition - <span class="number">0.02</span> * fraction * positionCount);</span><br><span class="line">  <span class="comment">//返回缩放后，进行Y方向偏移的Widget</span></span><br><span class="line">  <span class="keyword">return</span> Transform.translate(</span><br><span class="line">    offset: Offset(<span class="number">0</span>, translationY),</span><br><span class="line">    child: Transform.scale(</span><br><span class="line">      scale: scale,</span><br><span class="line">      child: item,</span><br><span class="line">    ),</span><br><span class="line">  );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于向第一位移动的选中卡片，也是同理，只不过是根据该卡片对应的转换器来进行自定义动画的转换。</p>
+<p>最后的效果，就像演示图中第一次点击，图片向前翻转到第一位的效果一样。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>由于Flutter采用的是声明式的视图构建方式，在编码初期，多少会受到原生编码方式的思维影响，而觉得很难受。但是在熟悉了之后，就会发现其实很多思想都是共通的，比如Animation，比如插值器的概念等等。</p>
+<p>另外，研读源码仍然是最有效的解决问题的方式，比如相比Android中直接对ScrollView进行animateTo操作，在Flutter中需要通过ScrollController进行animateTo操作，正是这一点让我找到了在Flutter中实现InfiniteCards效果的方法。</p>
+<p>更具体的Demo请前往Github的Flutter-InfiniteCards Repo，欢迎大家star和提issue。</p>
+<p>再次贴一下Github地址：<a href="https://github.com/BakerJQ/Flutter-InfiniteCards" target="_blank" rel="noopener">https://github.com/BakerJQ/Flutter-InfiniteCards</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/28/20190228_WeAppBunXin/" rel="next" title="小程序开发之影分身术">
+                <i class="fa fa-chevron-left"></i> 小程序开发之影分身术
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">BakerJ</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#思路"><span class="nav-number">2.</span> <span class="nav-text">思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件总览"><span class="nav-number">3.</span> <span class="nav-text">组件总览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Controller"><span class="nav-number">4.</span> <span class="nav-text">Controller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Helper"><span class="nav-number">5.</span> <span class="nav-text">Helper</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义动画"><span class="nav-number">6.</span> <span class="nav-text">自定义动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BakerJ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/schemes/muse.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
